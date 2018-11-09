@@ -30,6 +30,12 @@ Solidityによって，投票，クラウドファンディング，ブライン
     based IDE that allows you to write Solidity smart contracts, then deploy
     and run the smart contracts.
 
+.. 注意::
+    現状Solinityを試す最良の方法は
+    `Remix <https://remix.ethereum.org/>`_を使うことです．
+    (ロードするにはしばらく時間がかかりますので，辛抱してください).Remixはウェブブラウザー
+    ベースのIDEで，Solidityのスマートコントラクトを書いた上で，そのスマートコントラクトをデプロイして実行することができます．
+
 .. warning::
     Since software is written by humans, it can have bugs. Thus, also
     smart contracts should be created following well-known best-practices in
@@ -38,11 +44,20 @@ Solidityによって，投票，クラウドファンディング，ブライン
     Finally, blockchains have their own things to watch out for, so please take
     a look at the section :ref:`security_considerations`.
 
-Translations
+.. 警告::
+    ソフトウェアは人間が書くものなので，バグがあることがあります．したがって，
+    スマートコントラクトも，ソフトウェア工学において良く知られたベストプラクティスに従って作られるべきです．
+    これには，コードレビュー，テスト，監査と正しさの証明が含まれます．
+    また，ユーザはしばしばコードを，その作者よりも信頼していることに注意してください．
+    最後に，ブロックチェーンはそれ自身に注意しておくべきことがあるので，次の節を是非参照してください :ref:`security_considerations`.
+
+Translations　翻訳
 ------------
 
 This documentation is translated into several languages by community volunteers
 with varying degrees of completeness and up-to-dateness. The English version stands as a reference.
+この文章はコニュニティーのボランティアによって，いくつかの言語に，完全性と最新性については様々ですが，翻訳されています．
+英語版が基準となります．
 
 * `Simplified Chinese <http://solidity-cn.readthedocs.io>`_ (in progress)
 * `Spanish <https://solidity-es.readthedocs.io>`_
@@ -50,26 +65,41 @@ with varying degrees of completeness and up-to-dateness. The English version sta
 * `Korean <http://solidity-kr.readthedocs.io>`_ (in progress)
 * `French <http://solidity-fr.readthedocs.io>`_ (in progress)
 
-Language Documentation
+Language Documentation言語仕様
 ----------------------
 
 On the next pages, we will first see a :ref:`simple smart contract <simple-smart-contract>` written
 in Solidity followed by the basics about :ref:`blockchains <blockchain-basics>`
 and the :ref:`Ethereum Virtual Machine <the-ethereum-virtual-machine>`.
 
+以降のページでは，まずSolidityで書かれた:ref:`simple smart contract <simple-smart-contract>`
+を見て，次に:ref:`blockchains <blockchain-basics>`に関する基本，そして，
+:ref:`Ethereum Virtual Machine <the-ethereum-virtual-machine>`と続きます．
+
 The next section will explain several *features* of Solidity by giving
 useful :ref:`example contracts <voting>`.
 Remember that you can always try out the contracts
 `in your browser <https://remix.ethereum.org>`_!
 
+次の節はSolidityのいくつかの*機能*について，有用な:ref:`example contracts <voting>`
+を示して説明します．
+コントラクトを`自分のブラウザ<https://remix.ethereum.org>`_で
+いつでも試してみることができることを忘れないで!
+
 The fourth and most extensive section will cover all aspects of Solidity in depth.
+
+4番目のそしてもっとも稠密な節では，Solidityのすべての面について深くカバーします．
 
 If you still have questions, you can try searching or asking on the
 `Ethereum Stackexchange <https://ethereum.stackexchange.com/>`_
 site, or come to our `gitter channel <https://gitter.im/ethereum/solidity/>`_.
 Ideas for improving Solidity or this documentation are always welcome!
 
-Contents
+まだ疑問があれば，サーチしてみるか，`Ethereum Stackexchange <https://ethereum.stackexchange.com/>`_に質問したり，
+`gitter channel <https://gitter.im/ethereum/solidity/>`_を訪問することができます．
+Solidityやこの文章を改良するアイデアはいつでも歓迎します!
+
+Contents目次
 ========
 
 :ref:`Keyword Index <genindex>`, :ref:`Search Page <search>`
