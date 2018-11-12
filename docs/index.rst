@@ -30,9 +30,10 @@ Solidityによって，投票，クラウドファンディング，ブライン
     based IDE that allows you to write Solidity smart contracts, then deploy
     and run the smart contracts.
 
-.. 注意::
+.. note::
     現状Solinityを試す最良の方法は
-    `Remix <https://remix.ethereum.org/>`_を使うことです．
+    `Remix <https://remix.ethereum.org/>`_
+    を使うことです．
     (ロードするにはしばらく時間がかかりますので，辛抱してください).Remixはウェブブラウザー
     ベースのIDEで，Solidityのスマートコントラクトを書いた上で，そのスマートコントラクトをデプロイして実行することができます．
 
@@ -44,7 +45,7 @@ Solidityによって，投票，クラウドファンディング，ブライン
     Finally, blockchains have their own things to watch out for, so please take
     a look at the section :ref:`security_considerations`.
 
-.. 警告::
+.. warning::
     ソフトウェアは人間が書くものなので，バグがあることがあります．したがって，
     スマートコントラクトも，ソフトウェア工学において良く知られたベストプラクティスに従って作られるべきです．
     これには，コードレビュー，テスト，監査と正しさの証明が含まれます．
@@ -83,8 +84,8 @@ Remember that you can always try out the contracts
 
 次の節はSolidityのいくつかの*機能*について，有用な:ref:`example contracts <voting>`
 を示して説明します．
-コントラクトを`自分のブラウザ<https://remix.ethereum.org>`_で
-いつでも試してみることができることを忘れないで!
+コントラクトを`自分のブラウザ<https://remix.ethereum.org>`_
+でいつでも試してみることができることを忘れないで!
 
 The fourth and most extensive section will cover all aspects of Solidity in depth.
 
@@ -95,8 +96,9 @@ If you still have questions, you can try searching or asking on the
 site, or come to our `gitter channel <https://gitter.im/ethereum/solidity/>`_.
 Ideas for improving Solidity or this documentation are always welcome!
 
-まだ疑問があれば，サーチしてみるか，`Ethereum Stackexchange <https://ethereum.stackexchange.com/>`_に質問したり，
-`gitter channel <https://gitter.im/ethereum/solidity/>`_を訪問することができます．
+まだ疑問があれば，サーチしてみるか，`Ethereum Stackexchange <https://ethereum.stackexchange.com/>`_
+に質問したり，`gitter channel <https://gitter.im/ethereum/solidity/>`_
+を訪問することができます．
 Solidityやこの文章を改良するアイデアはいつでも歓迎します!
 
 Contents目次
