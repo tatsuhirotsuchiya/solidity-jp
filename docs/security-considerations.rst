@@ -1,16 +1,24 @@
 .. _security_considerations:
 
 #######################
-Security Considerations
+Security Considerations　セキュリティに関する配慮
 #######################
 
 While it is usually quite easy to build software that works as expected,
 it is much harder to check that nobody can use it in a way that was **not** anticipated.
 
+期待通りに動くソフトウェアを作るのは通常はかなり簡単ですが，だれもが予想**しない**方法で
+それを使うことができないことを確認するのはずっと困難です．
+
 In Solidity, this is even more important because you can use smart contracts
 to handle tokens or, possibly, even more valuable things. Furthermore, every
 execution of a smart contract happens in public and, in addition to that,
 the source code is often available.
+
+Solidityにおいて，このことが更に重要になるのは，スマートコントラクトを，
+トークンや，事によっては，さらに価値のあるものを扱うのに使うことができるためです．
+しかも，スマートコントラクトの一回一回の実行は公共の場で行われ，それに加えて，
+ソースコードについても，多くの場合手に入れることが可能なのです．
 
 Of course you always have to consider how much is at stake:
 You can compare a smart contract with a web service that is open to the
@@ -18,6 +26,15 @@ public (and thus, also to malicious actors) and perhaps even open source.
 If you only store your grocery list on that web service, you might not have
 to take too much care, but if you manage your bank account using that web service,
 you should be more careful.
+
+もちろんどの程度が問題なのかについても常に考える必要があります．
+スマートコントラクトを，公共にオープンなウェブサービスと
+（したがって，悪意あるアクターと）比較することができますし，おそらく
+オープンソースとさえも比較可能でしょう．
+もし，ウェブサービスに食料雑貨を記録しているだけなのであれば，それほど心配を
+する必要はないかもしれませんが，もしそのウェブサービスを使って銀行口座を管理している
+のであれば，もっと用心深くなるべきです．
+
 
 This section will list some pitfalls and general security recommendations but
 can, of course, never be complete. Also, keep in mind that even if your
@@ -28,23 +45,40 @@ can be found in the
 that there is a bug bounty program that covers the code generator of the
 Solidity compiler.
 
+この節では，いくつかの落とし穴や一般的なセキュリティに関する推奨事項を挙げますが，もちろん
+それらが完全であることは絶対にありません．また，スマートコントラクトにバグがなくても，
+コンパイラやプラットフォーム自身にバグがあるかもしれないということに，注意しましょう．
+コンパイラのいくつかの知られているセキュリティ関連のバグの一覧は，
+:ref:`list of known bugs<known_bugs>`,
+にあり，これは機械的に可読でもあります．
+Solidityコンパイラのコード生成器にも適用できる，バグ探しプログラムがあることに注意しましょう．
+
 As always, with open source documentation, please help us extend this section
 (especially, some examples would not hurt)!
 
+オープンソースの文章についていつものことですが，このセクションの拡張を是非手伝ってください
+（特に，例については損はないです）!
+
 ********
-Pitfalls
+Pitfalls落とし穴
 ********
 
-Private Information and Randomness
+Private Information and Randomness プライベートな情報とランダム性
 ==================================
 
 Everything you use in a smart contract is publicly visible, even
 local variables and state variables marked ``private``.
 
+スマートコントラクト内で使うものすべては，たとえ，局所変数や``priviate''とマークしてある状態変数でも，
+公共の場から見えます．
+
 Using random numbers in smart contracts is quite tricky if you do not want
 miners to be able to cheat.
 
-Re-Entrancy
+もしマイナーにズルをさせたくないのであれば，
+乱数をコントラクトで使うのはかなりトリッキーです．
+
+Re-Entrancy 再入性
 ===========
 
 Any interaction from a contract (A) with another contract (B) and any transfer
@@ -52,6 +86,12 @@ of Ether hands over control to that contract (B). This makes it possible for B
 to call back into A before this interaction is completed. To give an example,
 the following code contains a bug (it is just a snippet and not a
 complete contract):
+
+コントラクト(A)から別のコントラクト(B)へのインタラクションや，
+イーサのどんな送金でも制御をコントラクト(B)に渡します．
+これはインタラクションが完了する前に，BがＡへコールバックすることを可能にします．
+例とするため，以下のコードはバグを含んでいます（これは単にスナップショットで，
+完全なコントラクトではありません）：
 
 ::
 

@@ -1,16 +1,21 @@
 ###############################
-Introduction to Smart Contracts
+Introduction to Smart Contractsスマートコントラクト入門
 ###############################
 
 .. _simple-smart-contract:
 
 ***********************
-A Simple Smart Contract
+A Simple Smart Contract簡単なスマートコントラクト
 ***********************
 
 Let us begin with a basic example that sets the value of a variable and exposes
 it for other contracts to access. It is fine if you do not understand
 everything right now, we will go into more detail later.
+
+まず，変数の値を設定して他のコントラクトからアクセスできるようにそれを
+公開する基本的な例から始めましょう．
+この時点ではすべてを理解していなくても問題ありません．
+追ってより詳細についてみていきます．
 
 Storage
 =======
@@ -38,6 +43,13 @@ contract is not compilable with a new (breaking) compiler version, where it coul
 So-called pragmas are common instructions for compilers about how to treat the
 source code (e.g. `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).
 
+最初の行は単にソースコードがSolidityバージョン0.4.0か，機能性を破壊しないより新しい
+バージョン(バージョン0.6.0まで，ただしこれ自身は含まない)で書かれていることを述べています．
+これは，コントラクトが異なった動作をする可能性がある新しい（破壊的な）コンパイラの
+バージョンと互換性がないことをはっきりさせるためです．
+いわゆるpragmaとは，コンパイラに対して，ソースコードをどのように扱うかということ
+についての一般的な指示のことです（例． `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_)
+
 A contract in the sense of Solidity is a collection of code (its *functions*) and
 data (its *state*) that resides at a specific address on the Ethereum
 blockchain. The line ``uint storedData;`` declares a state variable called ``storedData`` of
@@ -47,8 +59,21 @@ code that manages the database. In the case of Ethereum, this is always the owni
 contract. And in this case, the functions ``set`` and ``get`` can be used to modify
 or retrieve the value of the variable.
 
+Solidityの意味でコントラクトとはコードの集まり（その*関数*）と
+イーサリアムブロックチェーン上の特定のアドレスに存在するデータ(*状態*)のことです．
+行 ``uint storedData;``は状態変数として``uint``型 (*256*ビット*u*nsigned（符号なし）
+ *int*eger（整数）)の``storedData`` を宣言しています．
+これは，クエリーを投げたりデータベースを管理するコードの関数を呼ぶことで
+変化させることができるデータベース上の単一スロットとして考えることができます．
+イーサリアムの場合，これはいつもそれを保持するコントラクトによってなされます．
+そして，この場合，関数``set``と``get``は変数の値を変更したり，取り出したりするのに
+利用できます．
+
 To access a state variable, you do not need the prefix ``this.`` as is common in
 other languages.
+
+状態変数にアクセスするのには，他の言語ではよくあるようにプリフェックスとして``this``を
+付ける必要はありません．
 
 This contract does not do much yet apart from (due to the infrastructure
 built by Ethereum) allowing anyone to store a single number that is accessible by
@@ -58,13 +83,29 @@ and overwrite your number, but the number will still be stored in the history
 of the blockchain. Later, we will see how you can impose access restrictions
 so that only you can alter the number.
 
+このコントラクトはこの値を公示するのを制限する(実現可能な)方法を装備しておらず，
+(イーサリアムによって築かれたインフラストラクチャーによって)
+世界のだれもがアクセス可能な一つの数をだれもが記憶することができるのと，まだほとんど違いません．
+もちろん，だれもが単に``set``を違う値で再度呼び出すことであなたの値を上書きすることが
+できますが，その値はブロックチェーンのヒストリ中にまだ記録されることになります．
+後程，どのようにアクセス制限を課して，あなた自身しか値を変えることができないように
+するかを見ます．
+
 .. note::
     All identifiers (contract names, function names and variable names) are restricted to
     the ASCII character set. It is possible to store UTF-8 encoded data in string variables.
 
+.. note::
+    すべての識別子(コントラクト名，関数名，変数名)はASCII文字に制限されています．
+    文字列変数にはUTF-8にエンコードされたデータを記憶することが可能です．
+
 .. warning::
     Be careful with using Unicode text, as similar looking (or even identical) characters can
     have different code points and as such will be encoded as a different byte array.
+
+.. warning::
+    Unicodeのテキストを使うには注意が必要です．同じような外見の（あるいは意味も）文字でも
+    違うコードポイントをもっており，それらは違うバイト配列にエンコードされるためです．
 
 .. index:: ! subcurrency
 
@@ -78,6 +119,12 @@ to implement a different issuance scheme).
 Furthermore, anyone can send coins to each other without a need for
 registering with username and password — all you need is an Ethereum keypair.
 
+以下のコントラクトは暗号通貨のもっとも簡単な形を実装します．
+何もないところからコインを生成することが可能ですが，
+それができるのはコントラクトを作成した人物のみです
+（違う発行方法を実装することも簡単です）．
+さらに，ユーザ名やパスワードを登録する必要なしにだれでもコインを送ることが可能です
+- 必要なのはイーサリアムキーペアだけです．
 
 ::
 
