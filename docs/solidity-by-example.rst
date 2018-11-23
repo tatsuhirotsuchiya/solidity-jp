@@ -1,5 +1,5 @@
 ###################
-Solidity by Example
+Solidity by Example 例によるSolidity
 ###################
 
 .. index:: voting, ballot
@@ -7,7 +7,7 @@ Solidity by Example
 .. _voting:
 
 ******
-Voting
+Voting 投票
 ******
 
 The following contract is quite complex, but showcases
@@ -20,19 +20,37 @@ how delegated voting can be done so that vote counting
 is **automatic and completely transparent** at the
 same time.
 
+以下のコントラクトはかなり複雑ですが，Solidityの機能の多くを
+例示しています．これは投票コントラクトを実装しています．
+もちろん，電子投票の主な問題はどう投票権を正しい人に割り当て
+どう不正を防ぐかです．ここではすべての問題を解決することはしませんが，
+すくなくとも代理投票が，投票を数えるのが**自動的かつ完全に透明**
+に同時になるように行えることを示します．？
+
 The idea is to create one contract per ballot,
 providing a short name for each option.
 Then the creator of the contract who serves as
 chairperson will give the right to vote to each
 address individually.
 
+考え方は投票券ごとに一つのコントラクトを生成することで，
+各選択肢には短い名前を与えます．
+そして，座長の役割となるコントラクトの作成者は
+各アドレスに個別に投票する権利を付与します．
+
 The persons behind the addresses can then choose
 to either vote themselves or to delegate their
 vote to a person they trust.
 
+アドレスの背景にある人々は，その後自分自身で投票するか，
+信頼する人物に投票を委ねるかを選択できます．
+
 At the end of the voting time, ``winningProposal()``
 will return the proposal with the largest number
 of votes.
+
+投票時間の終わりには，``winningProposal()``
+がもっとも多数の投票となった提案を返します．
 
 ::
 
@@ -188,16 +206,19 @@ of votes.
     }
 
 
-Possible Improvements
+Possible Improvements 可能な改善
 =====================
 
 Currently, many transactions are needed to assign the rights
 to vote to all participants. Can you think of a better way?
 
+現状では，多くのトランザクションが投票権を全員の参加者に割り当てるのに
+必要です．もっとよい方法を考えることはできないでしょうか？
+
 .. index:: auction;blind, auction;open, blind auction, open auction
 
 *************
-Blind Auction
+Blind Auction ブラインドオークション
 *************
 
 In this section, we will show how easy it is to create a
@@ -208,9 +229,15 @@ contract into a blind auction where it is not
 possible to see the actual bid until the bidding
 period ends.
 
+この節では，完全にブラインドなオークションコントラクトをイーサリアム上に
+生成するのが如何に簡単かを示します．
+だれもが行われた入札を見ることができる公開オークションから始めて，
+つぎにそのコントラクトを各緒うして，入札期間が終わるまでは実際の入札をみることが
+できないブラインドオークションにします．
+
 .. _simple_auction:
 
-Simple Open Auction
+Simple Open Auction 単純な公開オークション
 ===================
 
 The general idea of the following simple auction contract
@@ -223,6 +250,15 @@ After the end of the bidding period, the
 contract has to be called manually for the
 beneficiary to receive their money - contracts cannot
 activate themselves.
+
+以下の簡単なオークションコントラクトの一般的な考えは，
+だれもが自分の入札を入札期間中は提出できるというものです．
+入札はすでに，お金/イーサの送信を，入札者を入札に紐づけるために
+含んでいます．もし最大入札額が更新されたら，それまでの最大入札額の
+入札者にお金が払い戻されます．
+入札期間が終了した後，コントラクトは手動で呼ばれなければ
+お金を受け取るために受益者（beneficiary）が呼ばなければなりません．
+コントラクトは自分自身を起動することはできません．
 
 ::
 
@@ -351,7 +387,7 @@ activate themselves.
         }
     }
 
-Blind Auction
+Blind Auction ブラインドオークション
 =============
 
 The previous open auction is extended to a blind auction
@@ -360,6 +396,11 @@ that there is no time pressure towards the end of
 the bidding period. Creating a blind auction on a
 transparent computing platform might sound like a
 contradiction, but cryptography comes to the rescue.
+
+先の公開オークションをブラインドオークションに以下で拡張します．
+ブラインドオークションの利点は入札期間の終わりへの時間のプレッシャーが
+ないことです．ブラインドオークションを透明な計算基盤上に構築することは
+矛盾のように聞こえますが，暗号技術が役に立ってくれます．
 
 During the **bidding period**, a bidder does not
 actually send her bid, but only a hashed version of it.
@@ -371,12 +412,32 @@ to reveal their bids: They send their values
 unencrypted and the contract checks that the hash value
 is the same as the one provided during the bidding period.
 
+**入札期間**中では，入札者は実際には入札額を送りませんが，
+そのハッシュされたものを送ります．
+現状では二つの(十分に長い)値でハッシュ値が同じになるようなものを
+見つけることは現実的には不可能だと考えられているので，
+入札者はこれで入札を実行できます．
+入札期間の終了後，入札者は入札値を公開します．
+暗号化されていない値を送り，コントラクトがそのハッシュ値が
+入札期間に送られたものと一致するかを調べます．
+
+
+
 Another challenge is how to make the auction
 **binding and blind** at the same time: The only way to
 prevent the bidder from just not sending the money
 after they won the auction is to make her send it
 together with the bid. Since value transfers cannot
 be blinded in Ethereum, anyone can see the value.
+
+別の困難はどうやってオークションを同時に**バインディングとブラインド**に
+できるかということです．
+入札者がオークションに勝った後で入金しないのを防ぐ唯一の方法は，
+入札と一緒に送金させることです．
+イーサリアムでは値の送信（送金？）はブラインドにできないので，
+だれもがその値を見ることができます．
+
+
 
 The following contract solves this problem by
 accepting any value that is larger than the highest
@@ -387,6 +448,11 @@ flag to place invalid bids with high value transfers):
 Bidders can confuse competition by placing several
 high or low invalid bids.
 
+以下のコントラクトはこの問題を最高の入札額より大きな値を受理することで解決します．
+これはもちろん公開する段階でしか調べることができませんが，
+ある入札は**無効**かもしれませんし，これはわざとそうしているのです
+（大きい額の送金を伴う無効な入札を示す明示的なフラグも提供しています）．
+入札者は大小さまざまな無効な入札によって，競争を混乱させることができます．
 
 ::
 
