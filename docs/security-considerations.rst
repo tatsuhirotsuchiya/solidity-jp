@@ -116,6 +116,14 @@ basically retrieve all the Ether in the contract. In particular, the
 following contract will allow an attacker to refund multiple times
 as it uses ``call`` which forwards all remaining gas by default:
 
+この問題は制限されたガスが``send``の一部なためそれほど深刻ではありませんが，
+弱点をまだ晒しています．イーサの送金が常にコードの実行を含むことができるため，
+受取人が``withdraw``に再入するようにコールバックするコントラクトかもしれないからです．
+これはコントラクトに複数回の払い戻しをさせ，基本的にコントラクトのすべてのイーサを
+取得させることになります．特に，次のコントラクトは攻撃者に複数回払い戻しを
+可能にします．というのもすべての残りのガスをデフォルトで転送する``コール``を
+用いているからです．
+
 ::
 
     pragma solidity >=0.4.0 <0.6.0;
@@ -134,6 +142,9 @@ as it uses ``call`` which forwards all remaining gas by default:
 
 To avoid re-entrancy, you can use the Checks-Effects-Interactions pattern as
 outlined further below:
+
+再入性を防ぐためには，さらに下で示しているChecks-Effects-Interactionsパターンを
+利用できます．
 
 ::
 
@@ -155,7 +166,12 @@ function call on another contract. Furthermore, you also have to take
 multi-contract situations into account. A called contract could modify the
 state of another contract you depend on.
 
-Gas Limit and Loops
+再入性はイーサの送金の効果ではなく別のコントラクトへでの何らかの関数コールの
+効果であることに注意してください．さらに，多重のコントラクトがある状態を
+考慮する必要もあります．コールされたコントラクトは，あなたが依存している別の
+コントラクトの状態を変更する可能性があります．
+
+Gas Limit and Loops ガス制限とループ
 ===================
 
 Loops that do not have a fixed number of iterations, for example, loops that depend on storage values, have to be used carefully:
@@ -165,13 +181,28 @@ contract to be stalled at a certain point. This may not apply to ``view`` functi
 to read data from the blockchain. Still, such functions may be called by other contracts as part of on-chain operations
 and stall those. Please be explicit about such cases in the documentation of your contracts.
 
-Sending and Receiving Ether
+ループ　繰り返し数が固定でないループ，たとえば，ストレージの値に依存したループは，
+用心して使用する必要があります．
+ブロックガスの制限によって，トランザクションは一定のガスしか消費することができません．明示的か
+通常のオペレーション？によって，ループの繰り返し数はブロックガスの制限を超えて増加することがあり，
+これはコントラクト全体をある点でストールさせてしまうことがあります．
+これはブロックチェーンからデータを読み出すためだけに実行される``view``関数には当てはまらない場合があります．
+それでも，このような関数は他のコントラクトからチェーン上に対するオペレーションの一部としてコールされる
+場合があり，それらをストールすることがあります．是非，コントラクトのドキュメンテーションでは，
+このような場合について明示してください．
+
+Sending and Receiving Ether イーサの送金と受領
 ===========================
 
 - Neither contracts nor "external accounts" are currently able to prevent that someone sends them Ether.
   Contracts can react on and reject a regular transfer, but there are ways
   to move Ether without creating a message call. One way is to simply "mine to"
   the contract address and the second way is using ``selfdestruct(x)``.
+
+- コントラクトも"外部のアカウント"も現状ではだれかがイーサを送金してくるのを防ぐことはできません．
+  コントラクトは通常の送金には応対して拒絶することができますが，メッセージコールを生成しないで
+  イーサを動かす方法があります．一つは単にコントラクトアドレスを"採掘"するとで，二つ目の方法は
+  ``selfdestruct(x)``を用いることです．
 
 - If a contract receives Ether (without a function being called), the fallback function is executed.
   If it does not have a fallback function, the Ether will be rejected (by throwing an exception).
@@ -181,6 +212,14 @@ Sending and Receiving Ether
   To be sure that your contract can receive Ether in that way, check the gas requirements of the fallback function
   (for example in the "details" section in Remix).
 
+- コントラクトがイーサを受領したら（関数を呼び出さないで），フォールバック関数が実行されます．
+  フォールバック関数がない場合は，イーサは拒否されます（例外が投げられます）．
+  フォールバック関数の実行中，コントラクトは自身がパスした(2300ガス)その時点で利用可能な
+  "ガスstipend"にのみ依存します．このstipendはストレージを変更するのには十分ではありません．
+  （ただし，このことを当りまえとは考えないでください．stipendは今後のハードフォークで変更されるかもしれません．）
+　　コントラクトがそのようにしてイーサを受領できるのを確実にするには，フォールバック関数のガスの要求を確認してください
+　 (例へば，remixの"詳細"の節)．
+
 - There is a way to forward more gas to the receiving contract using
   ``addr.call.value(x)("")``. This is essentially the same as ``addr.transfer(x)``,
   only that it forwards all remaining gas and opens up the ability for the
@@ -189,7 +228,17 @@ Sending and Receiving Ether
   into the sending contract or other state changes you might not have thought of.
   So it allows for great flexibility for honest users but also for malicious actors.
 
+- ``addr.call.value(x)("")``をつかって，受け取り側のコントラクトにより多くのガスを転送する方法があります．
+  これは，本質的には ``addr.transfer(x)``と同様で，(誤植？)残りのすべてのガスを送り，
+  　受け取り側により高価な動作を行うことのできる可能性を開きます（そしえ，エラーを自動的に
+    伝搬するかわりにフェイラーコードを返します)．
+    これは，送り側のコントラクトへのコールバックを含むかもしれませんし，考えもしなかった他の状態
+    変化を含むかもしれません．なので，これは正直なユーザに大きな自由度をもたらしますが，
+    悪意あるアクターについても同様です．
+
 - If you want to send Ether using ``address.transfer``, there are certain details to be aware of:
+
+- もしイーサを``address.transfer``を用いて送金したいなら，知っておくべき詳細があります．
 
   1. If the recipient is a contract, it causes its fallback function to be executed which can, in turn, call back the sending contract.
   2. Sending Ether can fail due to the call depth going above 1024. Since the caller is in total control of the call
@@ -203,7 +252,19 @@ Sending and Receiving Ether
      means for the recipient to block progress in the sending contract. Again, the best practice here is to use
      a :ref:`"withdraw" pattern instead of a "send" pattern <withdrawal_pattern>`.
 
-Callstack Depth
+  1. もし受け取り側がコントラクトならば，これは自身のフォールバック関数の実行をもたらし，結果，送り側のコントラクトをコールバックします．
+  2. イーサの送金は，コールの深さが1024を超えることで，失敗する可能性があります．呼び出し側はコールの深さについて完全な制御権があるので，
+     強制的に送金を失敗させることが可能です．この可能性を考慮するか，``send``を使うとともに常に戻り値をチェックしましょう．
+    better yet, 代わりに受取側がイーサを引き出すことができるようなパターンを用いてコントラクトを記述することです．
+  3. イーサの送金もまた失敗する可能性があり，それは受け取り側のコントラクトが割り当てられた量のガスを必要とするからです
+    (明示的に``require``, ``assert``, ``revert``, ``throw``を用いるか，オペレーションが単に高価すぎるため)．
+    つまり， コントラクトは"ガス欠 runs out of gas" (OOG)します．
+    もし``transfer``や``send``を戻り値のチェックとともに使っているなら，これは
+    受取人が送り側のコントラクトの進行をブロックするための手段を与えるかもしれません．
+    繰り返しますが，ここでのベストプラクティスは :ref:`"withdraw" パターンを"send" パターンの代わりに用いることです <withdrawal_pattern>`.
+
+
+Callstack Depth コールスタックの深さ
 ===============
 
 External function calls can fail any time because they exceed the maximum
@@ -211,10 +272,21 @@ call stack of 1024. In such situations, Solidity throws an exception.
 Malicious actors might be able to force the call stack to a high value
 before they interact with your contract.
 
+外部からの関数コールは，1024の最大コールスタックを超えると，いつでも失敗する可能性があります．
+そのような場合，Solidityは例外を投げます．
+悪意あるアクターはあなたのコントラクトに関わる前に，コールスタックを大きな値にしておく
+ことができるかもしれません．
+
 Note that ``.send()`` does **not** throw an exception if the call stack is
 depleted but rather returns ``false`` in that case. The low-level functions
 ``.call()``, ``.callcode()``, ``.delegatecall()`` and ``.staticcall()`` behave
 in the same way.
+
+もしコールスタックが枯渇した場合，
+``.send()``は``false``を返し，例外を**投げない**ことに注意してください．
+低レベルの関数
+``.call()``, ``.callcode()``, ``.delegatecall()``, ``.staticcall()`` は
+同じように動作します．
 
 tx.origin
 =========
