@@ -604,7 +604,7 @@ high or low invalid bids.
 .. index:: purchase, remote purchase, escrow
 
 ********************
-Safe Remote Purchase
+Safe Remote Purchase 安全なリモート購入
 ********************
 
 ::
@@ -710,7 +710,7 @@ Safe Remote Purchase
     }
 
 ********************
-Micropayment Channel
+Micropayment Channel マイクロペイメントチャネル
 ********************
 
 In this section we will learn how to build a simple implementation
@@ -719,7 +719,13 @@ repeated transfers of Ether between the same parties secure, instantaneous, and
 without transaction fees. To do it we need to understand how to
 sign and verify signatures, and setup the payment channel.
 
-Creating and verifying signatures
+この節ではペイメントチャネルの簡単な実装の作り方を学びます．
+暗号署名を用いて同じパーティー間のイーサの繰り返し送金を，安全で，瞬間的で，
+トランザクションフィーなしにします．
+そうするためには，署名をし署名を検証するのと，ペイメントチャネルをセットアップする
+方法を理解する必要があります．
+
+Creating and verifying signatures 署名の生成と検証
 =================================
 
 Imagine Alice wants to send a quantity of Ether to Bob, i.e.
