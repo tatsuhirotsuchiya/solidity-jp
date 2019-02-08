@@ -733,6 +733,11 @@ Alice is the sender and the Bob is the recipient.
 Alice only needs to send cryptographically signed messages off-chain
 (e.g. via email) to Bob and it will be very similar to writing checks.
 
+アリスがある量のイーサをボブに送りたいと思っていると想像してください．
+つまり，アリスは送金者でボブが受領者です．
+アリスに必要なのは，チェーン外で暗号的に署名されたメッセージ（例えば電子メール）を
+ボブに送ることだけで，これは小切手を切るのに非常に似ています．
+
 Signatures are used to authorize transactions,
 and they are a general tool that is available to
 smart contracts. Alice will build a simple
@@ -742,6 +747,12 @@ to initiate a payment, she will let Bob
 do that, and therefore pay the transaction fee.
 The contract will work as follows:
 
+署名はトランザクションのオーソライズに使われ，それはスマートコントラクトで利用可能な
+一般的なツールです．アリスは簡単なスマートコントラクトでイーサの送金を実現しますが，
+通常の方法では，自分自身で支払いの関数を呼び出すのではなく，ボブにそうさせることで，
+トランサクション手数料を払わせます．
+このコントラクトは以下の様に動作します．
+
     1. Alice deploys the ``ReceiverPays`` contract, attaching enough Ether to cover the payments that will be made.
     2. Alice authorizes a payment by signing a message with their private key.
     3. Alice sends the cryptographically signed message to Bob. The message does not need to be kept secret
@@ -749,7 +760,14 @@ The contract will work as follows:
     4. Bob claims their payment by presenting the signed message to the smart contract, it verifies the
        authenticity of the message and then releases the funds.
 
-Creating the signature
+    1. アリスは``受領者支払``コントラクトを配置し，生じる支払いをカバーできる十分なイーサを添付します．
+    2. アリスは自分のプライベートキーでメッセージに署名することで，支払いをオーソライズします．
+    3. アリスは暗号的に署名されたメッセージをボブに送ります．メッセージは秘匿される必要はありません
+    (これは後で理解できます)，そしてそれを送る機構は何であっても問題ありません．
+    4. ボブはスマートコントラクトへの署名付きメッセージを示すことで，支払いを主張できます．
+    スマートコントラクトはメッセージの真正性を検証し，そしてファンドをリリースします．
+
+Creating the signature 署名の生成
 ----------------------
 
 Alice does not need to interact with Ethereum network to
@@ -758,6 +776,13 @@ In this tutorial, we will sign messages in the browser
 using ``web3.js`` and ``MetaMask``.
 In particular, we will use the standard way described in `EIP-762 <https://github.com/ethereum/EIPs/pull/712>`_,
 as it provides a number of other security benefits.
+
+アリスはトランザクションに署名するのにイーサリアムネットワークと
+やり取りする必要はなく，この過程は完全にオフラインで行われます．
+本チュートリアルでは，メッセージの署名は，``web3.js``と``MetaMask``を用いてブラウザ上で
+行います．
+特に，`EIP-762 <https://github.com/ethereum/EIPs/pull/712>`_,に記述されている標準的な方法を用います．
+これは，他の多数のセキュリティ上の利点があるためです．
 
 ::
 
@@ -770,7 +795,11 @@ Note that the ``web3.personal.sign`` prepends the length of the message to the s
 Since we hash first, the message will always be exactly 32 bytes long,
 and thus this length prefix is always the same, making everything easier.
 
-What to Sign
+``web3.personal.sign``はメッセージの長さを署名されたデータの前に付加しているのに注意してください．
+最初にハッシュを行うため，メッセージは常に正確に32バイトの長さとなり，
+そのためこのプリフェックス長は常に同じで，すべてがより簡単になります．
+
+What to Sign 何に署名するか
 ------------
 
 For a contract that fulfills payments, the signed message must include:
@@ -779,12 +808,24 @@ For a contract that fulfills payments, the signed message must include:
     2. The amount to be transferred
     3. Protection against replay attacks
 
+支払いを実現するコントラクトについて，署名付きメッセージは以下を含んでいなければなりません．
+
+    1. 受領者のアドレス
+    2. 送金する額
+    3. リプライ攻撃への防御
+
 A replay attack is when a signed message is reused to claim authorization for
 a second action.
 To avoid replay attacks we will use the same as in Ethereum transactions
 themselves, a so-called nonce, which is the number of transactions sent by an
 account.
 The smart contract will check if a nonce is used multiple times.
+
+リプライ攻撃は，署名されたメッセージが次のアクションに対する真正性を主張するのに
+再利用される場合です．
+リプライ攻撃を避けるために使うのは，イーサリアムのトランザクション自身の場合と同様に，
+いわゆるナンスで，これはアカウントが送信したトランザクションの数とします．
+スマートコントラクトはナンスが複数回使われていないかをチェックします．
 
 There is another type of replay attacks, it occurs when the
 owner deploys a ``ReceiverPays`` smart contract, performs some payments,
@@ -793,11 +834,21 @@ and then destroy the contract. Later, she decides to deploy the
 know the nonces used in the previous deployment, so the attacker
 can use the old messages again.
 
+別の種類のリプライアタックもあり，これはオーナーが``受領者支払``スマートコントラクトを
+デプロイし，何等かの支払いをし，そしてコントラクトを破壊したときに起ります．
+後で，アリスが``受領者支払``コントラクトを配置しようと決めたのに，新しいコントラクトが
+前のデプロイで用いたノンスを知らず，そのため攻撃者は以前のメッセージを再度用いることが
+可能になります．
+
 Alice can protect against it including
 the contract's address in the message, and only
 messages containing contract's address itself will be accepted.
 This functionality can be found in the first two lines of the ``claimPayment()`` function in the full contract
 at the end of this chapter.
+
+メッセージにコントラクトのアドレスを含めることで，
+アリスはこの攻撃を防ぐことができ，コントラクト自身のアドレスを含むメッセージのみを受け付けます．
+この機能はこの章の最後のコントラクト全体の中の関数``claimPayment()``の最初の2行に見出すことができます．
 
 Packing arguments
 -----------------
